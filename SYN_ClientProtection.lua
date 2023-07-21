@@ -149,7 +149,7 @@ anticheat.Methods = {
 		local rbxassetid_count = 0
 		game:GetService("ContentProvider"):preloadAsync({game.CoreGui}, function(assetid, status)
 			if assetid:find("rbxassetid://") then
-				rbxassetid_count += 1
+				rbxassetid_count = rbxassetid_count + 1
 			end
 		end)
 		if rbxassetid_count > 9 then
@@ -270,7 +270,7 @@ anticheat.Methods = {
 
 		local function flycheck()
 			if Humanoid.FloorMaterial == Enum.Material.Air then
-				airTime += 1
+				airTime = airTime + 1
 			else
 				airTime = 0
 				airTimeChecks = 0
@@ -279,7 +279,7 @@ anticheat.Methods = {
 			if airTime >= max_airTime/3 then
 				if Humanoid:GetState() == Enum.HumanoidStateType.Freefall or Humanoid:GetState() == Enum.HumanoidStateType.Jumping then
 					airTime = 0
-					airTimeChecks += 1
+					airTimeChecks = airTimeChecks + 1
 					if airTimeChecks >= 3 then
 						anticheat.Methods.Kick("Too long airtime.")
 					end
