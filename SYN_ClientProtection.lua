@@ -152,7 +152,7 @@ anticheat.Methods = {
 				rbxassetid_count = rbxassetid_count + 1
 			end
 		end)
-		if rbxassetid_count > 9 then
+		if rbxassetid_count > 10 then
 			anticheat.Methods.Kick("Illegal CoreUI-Implementation")
 		end
 	end,
