@@ -38,7 +38,7 @@ anticheat.Methods = {
 
 	PlayerResetting = false,
 
-	CharacterSettings = {},
+	Settings = {},
 
 	CharacterInstances = {
 		character = nil, 
@@ -64,14 +64,14 @@ anticheat.Methods = {
 	end,
 
 	loadSettings = function()
-		local CharacterSettings = require(script.CharacterSettings)
+		local Settings = require(script.Settings)
 
-		for i,v in pairs(CharacterSettings) do
-			anticheat.Methods.CharacterSettings[i] = v
+		for i,v in pairs(Settings) do
+			anticheat.Methods.Settings[i] = v
 		end
 
 		anticheat.Methods.SettingsLoaded = true
-		script.CharacterSettings:Destroy()
+		script.Settings:Destroy()
 
 		local plr = shared.plr
 		anticheat.Methods.CharacterInstances.character = workspace:WaitForChild(plr.Name)
@@ -116,6 +116,28 @@ anticheat.Methods = {
 		return key
 	end,
 
+	CreateDisString = function(originalString)
+		local splittedOriginalString = originalString:split("")
+		local newString = ""
+		local rngPos = math.random(1, #splittedOriginalString)
+		local randomCharThatChanges = splittedOriginalString[rngPos]
+		local getOtherChar = function(char)
+			local rngPos = 1
+			repeat
+				rngPos = math.random(1, #splittedOriginalString)
+			until splittedOriginalString[rngPos] ~= char
+			return splittedOriginalString[rngPos]
+		end
+		for i,v in pairs(splittedOriginalString) do
+			if i == rngPos then
+				newString = newString..getOtherChar(v)
+			else
+				newString = newString..v
+			end
+		end
+		return newString
+	end,
+
 	checkIfIsA = function(instance)
 		for i,v in pairs(anticheat.Methods.ExploitableInstances) do
 			if instance:IsA(v) then
@@ -140,6 +162,10 @@ anticheat.Methods = {
 		for _, instance in ipairs(game:GetDescendants()) do
 			if anticheat.Methods.checkIfIsA(instance) and instance:GetAttribute("secured") == nil then
 				instance:SetAttribute("key", anticheat.Methods.CreateKey())
+				if instance:GetAttribute(anticheat.Methods.Settings.protectedScriptAttribute) == nil then
+					local DisString = anticheat.Methods.CreateDisString(anticheat.Methods.Settings.protectedScriptAttribute)
+					instance:SetAttribute(DisString, DisString)
+				end
 				table.insert(anticheat.Methods.verifiedInstances, instance)
 			end			
 		end
@@ -164,17 +190,19 @@ anticheat.Methods = {
 			for i,v in pairs(anticheat.Methods.verifiedInstances) do
 				if anticheat.Methods.Connections[i] == nil and v.Parent ~= script then
 					anticheat.Methods.Connections[i] = v.Changed:Connect(function(change)
-						if anticheat.Methods.PlayerResetting == false then
+						if anticheat.Methods.PlayerResetting == false then						
 							if change == "Source" then
 								anticheat.Methods.Kick()
 							elseif change == "Parent" and v:IsA("LuaSourceContainer") then
 								wait(0.35)
 								if v ~= nil then
-									if v.Parent == nil then
+									if v.Parent == nil and v:GetAttribute(anticheat.Methods.Settings.protectedScriptAttribute) == nil then
 										anticheat.Methods.Kick("Illegal LuaSource-Removal")
 									end
 								else
-									anticheat.Methods.Kick("Illegal LuaSource-Removal")
+									if v:GetAttribute(anticheat.Methods.Settings.protectedScriptAttribute) == nil then
+										anticheat.Methods.Kick("Illegal LuaSource-Removal")
+									end								
 								end
 							end	
 						else
@@ -232,16 +260,16 @@ anticheat.Methods = {
 
 		repeat wait() until character ~= nil and HRP ~= nil and Humanoid ~= nil
 
-		local isDead = anticheat.Methods.CharacterSettings.isDead
-		local respawnTime = anticheat.Methods.CharacterSettings.respawnTime
-		local max_WalkSpeed_Allowed = anticheat.Methods.CharacterSettings.max_WalkSpeed_Allowed
-		local max_JumpPower_Allowed = anticheat.Methods.CharacterSettings.max_JumpPower_Allowed
-		local max_MaxHealth_Allowed = anticheat.Methods.CharacterSettings.max_MaxHealth_Allowed
-		local max_Health_Allowed = anticheat.Methods.CharacterSettings.max_Health_Allowed
-		local max_airTime = anticheat.Methods.CharacterSettings.max_airTime
-		local airTime = anticheat.Methods.CharacterSettings.airTime
-		local airTimeChecks = anticheat.Methods.CharacterSettings.airTimeChecks
-		local states_forbidden = anticheat.Methods.CharacterSettings.states_forbidden
+		local isDead = anticheat.Methods.Settings.isDead
+		local respawnTime = anticheat.Methods.Settings.respawnTime
+		local max_WalkSpeed_Allowed = anticheat.Methods.Settings.max_WalkSpeed_Allowed
+		local max_JumpPower_Allowed = anticheat.Methods.Settings.max_JumpPower_Allowed
+		local max_MaxHealth_Allowed = anticheat.Methods.Settings.max_MaxHealth_Allowed
+		local max_Health_Allowed = anticheat.Methods.Settings.max_Health_Allowed
+		local max_airTime = anticheat.Methods.Settings.max_airTime
+		local airTime = anticheat.Methods.Settings.airTime
+		local airTimeChecks = anticheat.Methods.Settings.airTimeChecks
+		local states_forbidden = anticheat.Methods.Settings.states_forbidden
 
 		local function WalkSpeedcheck()
 			local plr_speed = Humanoid.WalkSpeed
