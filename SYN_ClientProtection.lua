@@ -80,7 +80,7 @@ anticheat.Methods = {
 	end,
 
 	Kick = function(msg)
-		if anticheat.Methods.KickReason == "nil" then
+		if anticheat.Methods.KickReason == "nil" and plr:GetAttribute("ServerKick") == nil then
 			anticheat.Methods.KickReason = msg
 			shared.plr:Kick("Kicked due to exploiting! Reason: "..msg)
 		end
